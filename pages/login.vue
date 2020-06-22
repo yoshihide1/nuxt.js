@@ -1,26 +1,32 @@
 <template>
-  <div>
+  <div class="container">
     <label for="name">DisplayName</label>
     <p>
-      <input v-model="name" type="text" placeholder="半角英数、記号のみ(５～１６文字)" />
+      <input class="login__input" v-model="name" type="text" placeholder="半角英数、記号のみ(５～１６文字)" />
     </p>
     <label for="email">Email</label>
     <p>
-      <input v-model="email" type="email" placeholder="Email" />
+      <input class="login__input" v-model="email" type="email" placeholder="Email" />
     </p>
     <label for="password">Password</label>
     <p>
-      <input v-model="password" type="password" placeholder="Password(６～１６文字)" />
+      <input class="login__input" v-model="password" type="password" placeholder="Password(６～１６文字)" />
     </p>
     <p>
-      <button @click="emailLogin">Login</button>
+      <button class="login__button" @click="emailLogin">Login</button>
     </p>
+
     <label for="email">Email</label>
-    <input v-model="email" type="email" placeholder="Email" />
-    <label for="password">Password</label>
-    <input v-model="password" type="password" placeholder="Password(半角英数字)" />
     <p>
-      <button @click="signIn">SignIn</button>
+      <input class="login__input" v-model="email" type="email" placeholder="Email" />
+    </p>
+
+    <label for="password">Password</label>
+    <p>
+      <input class="login__input" v-model="password" type="password" placeholder="Password(半角英数字)" />
+    </p>
+    <p>
+      <button class="login__button" @click="signIn">SignIn</button>
     </p>
   </div>
 </template>
@@ -78,5 +84,27 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.container {
+  margin: 30px auto;
+  padding: 30px;
+  width: 50%;
+  text-align: center;
+  border-radius: 10px;
+  border: 5px solid darkcyan;
+}
+.login__input {
+  margin-bottom: 20px;
+  width: 70%;
+  height: 30px;
+  border: 2px solid darkcyan;
+  border-radius: 10px;
+}
+.login__button {
+  color: white;
+  background-color: darkcyan;
+  padding: 5px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
 </style>

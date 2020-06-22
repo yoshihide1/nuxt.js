@@ -7,21 +7,19 @@ export const state = () => ({
   userUid: "",
   userName: "",
   userEmail: "",
-  todos: []
+  todos: [],
+  tweet: []
 })
 
 export const mutations = {
   setUserData(state, userData) {
     state.userData = userData
   },
-  addTodo(state, todo) {
-    state.todos.push(todo)
-  },
-  clearTodo(state) {
-    state.todo = []
+  tweet(state, tweet) {
+    state.tweet = []
+    state.tweet = tweet
   }
 }
-
 export const actions = {
 
   emailLogin({ commit }, data) {
@@ -38,17 +36,19 @@ export const actions = {
         const email = result.user.email
         const uid = result.user.uid
         console.log("OK")
-        commit('setUserData', {name, email, uid})
+        commit('setUserData', { name, email, uid })
         this.$router.push('/')
       })
     }).catch((error) => {
       console.log(error)
     })
   },
-  signIn({ commit } , data) {
+  signIn({ commit }, data) {
     console.log("signin")
     firebase.auth().signInWithEmailAndPassword(data.email, data.password).then(() => {
       this.$router.push('/')
+    }).catch(() => {
+      alert("一致する登録情報がありません")
     })
   },
   checkAuth({ commit }) {
@@ -58,7 +58,7 @@ export const actions = {
         const name = user.displayName
         const email = user.email
         const uid = user.uid
-        commit('setUserData', {name, email, uid})
+        commit('setUserData', { name, email, uid })
       } else {
         console.log("error")
         this.$router.push('/login')
@@ -70,45 +70,11 @@ export const actions = {
       this.$router.push('/login')
     })
   },
- 
 
-  // fetchTweet({ commit }) {
-  //   tweetRef.get()
-  //   .then((res) => {
-  //     res.forEach((doc) => {
-  //       console.log(`success: ${doc.id} => ${doc.data()}`)
-  //       commit('addTodo', doc.data())
-  //     })
-  //   }).catch((error) => {
-  //     console.log(`error: ${error}`)
-  //   })
-  // },
-  // addTodo({ commit }, todo) {
-  //   console.log(todo)
-  //   todoRef.add({
-  //     todo: todo.todo,
-  //     limit: todo.limit
-  //   }).then((docRef) => {
-  //     console.log("Document written with ID:", docRef.id)
-  //     commit('addTodo', todo)
-  //   }).catch((error) => {
-  //     console.log("Error adding document:", error)
-  //   })
-
-  // }
 }
 export const getters = {
-  //ログインユーザー取得
-  getUserUid(state) {
-    return state.userUid
-  },
-  getUserName(state) {
-    return state.userName
-  },
-  getUserEmail(state) {
-    return state.userEmail
-  },
-  getTodos(state) {
-    return state.todos
+  getTweet: (state) => (name) => {
+    console.log(name)
+    return state.tweet.filter(tweet => tweet.name == name)
   }
 }
