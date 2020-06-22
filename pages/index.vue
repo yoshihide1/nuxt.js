@@ -3,24 +3,21 @@
     <div v-if="userData.name" class="hello">
       <p>こんにちは！{{ userData.name }}さん</p>
     </div>
-    <!-- <ul>
-      <li>{{ userData.name }}</li>
-      <li>{{ userData.email }}</li>
-      <li>{{ userData.uid }}</li>
-    </ul>-->
-    <div>
-      <div class="tweetList">
-        <label for="tweetList">List</label>
-        <div>ここに一覧</div>
+    <div class="">
       </div>
       <button @click="signOut">SignOut</button>
-      <nuxt-link to="/tweet">
-        <button>投稿</button>
-      </nuxt-link>
-      <nuxt-link :to="{name: 'users-id', params: {id: userData.email}}">
+     <p>
+      <button @click="addTweet">投稿</button>
+      <input v-model="newTweet" type="text" />
+     </p>
+      <nuxt-link :to="{name: 'users-id', params: {id: userData.name}}">
         <button>マイページ</button>
       </nuxt-link>
-      
+      <div class="tweetList">
+        <label for="tweetList">List</label>
+        <div v-for="(tweet, index) in tweets" :key="index">
+          <p>{{tweet.name}} : {{tweet.tweet}} : {{tweet.timestamp.seconds}}</p>
+        </div>
     </div>
   </div>
 </template>
@@ -32,10 +29,9 @@ import firebase from "~/plugins/firebase";
 export default {
   data() {
     return {
-      name: "",
-      email: "",
-      password: "",
-      db: firebase.firestore()
+      db: firebase.firestore(),
+      newTweet: "",
+      tweets: []
     };
   },
   computed: {
@@ -43,15 +39,41 @@ export default {
     ...mapState(["userData"])
   },
   methods: {
-    check() {
-      //onAuthStateChangedと同じ結果
-      const user = firebase.auth().currentUser;
-      if (user) {
-        console.log(user);
-        return user;
-      } else {
-        console.log("error");
+    // check() {
+    //   //onAuthStateChangedと同じ結果
+    //   const user = firebase.auth().currentUser;
+    //   if (user) {
+    //     console.log(user);
+    //     return user;
+    //   } else {
+    //     console.log("error");
+    //   }
+    // },
+    addTweet() {
+      if (this.newTweet.length < 5) {
+        alert("文字数が少なすぎます")
+        return
+      } 
+      if (this.newTweet.length > 200) {
+        alert("文字数が多すぎます")
+        return
       }
+      this.db
+        .collection("tweet")
+        .add({
+          tweet: this.newTweet,
+          name: this.userData.name,
+          timestamp: firebase.firestore.Timestamp.now(),
+          uid: this.userData.uid
+        })
+        .then(() => {
+          //flash処理を入れる
+          console.log("投稿完了");
+          this.newTweet = "";
+        })
+        .catch(() => {
+          console.log("error");
+        });
     },
     featchTweet() {
       this.db
@@ -59,7 +81,10 @@ export default {
         .limit(50)
         .get()
         .then(res => {
-          res.forEach(doc => {});
+          res.forEach(doc => {
+            console.log(doc.data())
+            this.tweets.push(doc.data())
+          });
         });
     },
     signOut() {
@@ -68,7 +93,7 @@ export default {
   },
   created() {
     this.$store.dispatch("checkAuth");
-    this.$store.dispatch("fetchTweet");
+    this.featchTweet()
   }
 };
 </script>

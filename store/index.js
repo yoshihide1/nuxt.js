@@ -54,7 +54,6 @@ export const actions = {
   checkAuth({ commit }) {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        console.log(user)
         console.log("checkAuth")
         const name = user.displayName
         const email = user.email
