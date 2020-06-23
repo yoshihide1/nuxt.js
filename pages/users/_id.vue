@@ -39,12 +39,12 @@ export default {
       this.myTweet = this.getTweet(this.userData.name);
     },
     deleteTweet(index) {
-      this.db.collection("tweet").doc()
+      this.db.collection("tweet").doc();
     }
   },
   created() {
     this.$store.dispatch("checkAuth");
-    this.getMyTweet()
+    this.getMyTweet();
   }
 };
 </script>

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button class="test__button" @click="featchTweet">最新のデータに更新(仮)</button>
     <div class="tweet__form">
       <p>
         <textarea
@@ -10,7 +11,7 @@
         ></textarea>
       </p>
       <p>
-        <button class="tweet__button" @click="addTweet">投稿</button>
+        <button class="tweet__add__button" @click="addTweet">投稿</button>
       </p>
       <p>{{ newTweet.length}}/150</p>
       <small class="font__red" v-if="(newTweet.length > 150)">文字数が多すぎます</small>
@@ -18,11 +19,18 @@
     </div>
 
     <div>
-      <label for="tweet__list">TweetList</label>
+      <label for="tweet__list">投稿一覧</label>
       <div class="tweet__list" v-for="(tweet, index) in tweets" :key="index">
-        <p>{{tweet.name}}</p>
-        <p>{{tweet.tweet}}</p>
-        <p>{{tweet.timestamp.seconds}}</p>
+        <p class="tweet__name">{{ tweet.name }}</p>
+        <p class="tweet__tweet">{{ tweet.tweet }}</p>
+        <p class="tweet__time">{{ tweet.timestamp.seconds }}</p>
+
+        <!-- この部分は最後に消す事 -->
+        <p>{{ tweet.id }}</p>
+
+        <div v-if="(tweet.uid == userData.uid)">
+          <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">削除</button>
+        </div>
       </div>
     </div>
   </div>
@@ -36,7 +44,8 @@ import navMenu from "~/components/navMenu";
 export default {
   data() {
     return {
-      db: firebase.firestore(),
+      dbTweet: firebase.firestore().collection("tweet"),
+      timestamp: firebase.firestore.Timestamp.now(),
       newTweet: "",
       tweets: []
     };
@@ -54,17 +63,25 @@ export default {
         alert("文字数が多すぎます");
         return;
       }
-      this.db
-        .collection("tweet")
+      const newTweet = this.newTweet;
+      this.dbTweet
         .add({
-          tweet: this.newTweet,
+          tweet: newTweet,
           name: this.userData.name,
-          timestamp: firebase.firestore.Timestamp.now(),
+          timestamp: this.timestamp,
           uid: this.userData.uid
         })
-        .then(() => {
+        .then(doc => {
           //flash処理を入れる
+          let { tweet, name, timestamp, uid } = {
+            tweet: newTweet,
+            name: this.userData.name,
+            timestamp: this.timestamp,
+            uid: this.userData.uid
+          };
           console.log("投稿完了");
+          //objectで渡すとvuexでエラーになるため
+          this.$store.commit("addTweet", { tweet, name, timestamp, uid });
           this.newTweet = "";
         })
         .catch(() => {
@@ -72,17 +89,34 @@ export default {
         });
     },
     featchTweet() {
-      this.db
-        .collection("tweet")
+      this.dbTweet
         .orderBy("timestamp", "desc")
         .limit(50)
         .get()
         .then(res => {
           res.forEach(doc => {
             console.log(doc.data());
-            this.tweets.push(doc.data());
+            this.tweets.push({
+              tweet: doc.data().tweet,
+              name: doc.data().name,
+              timestamp: doc.data().timestamp,
+              uid: doc.data().uid,
+              id: doc.id //ドキュメントid
+            });
           });
           this.$store.commit("tweet", this.tweets);
+        });
+    },
+    deleteTweet(docId) {
+      //記事のIDを取得して削除
+      this.dbTweet
+        .doc(docId)
+        .delete()
+        .then(() => {
+          console.log("削除");
+        })
+        .catch(() => {
+          console.log("error");
         });
     }
   },
@@ -95,19 +129,44 @@ export default {
 </script>
 
 <style>
+.test__button {
+  padding: 3px 20px;
+  color: white;
+  background-color: black;
+  border: 2px solid gray;
+  border-radius: 10px;
+}
 .tweet__form {
   margin: 2rem 0;
 }
-.tweet__button {
-  padding: 3px 1rem;
+.tweet__name {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+.tweet__time {
+  margin-bottom: 1rem;
+}
+.tweet__add__button {
+  padding: 5px 15px;
   color: white;
   background-color: rgb(48, 187, 241);
   border: 2px solid rgb(209, 209, 209);
   border-radius: 10px;
 }
+.tweet__delete__button {
+  padding: 5px 15px;
+  color: white;
+  background-color: rgb(255, 53, 53);
+  border: 2px solid rgb(209, 209, 209);
+  border-radius: 10px;
+}
 .tweet__list {
-  border: 2px solid gray;
-  margin: 2rem 0;
+  /* width: 90%;
+  text-align: left; */
+  border-top: 2px solid gray;
+  /* border-bottom: 2px solid gray; */
+  margin: 2rem auto;
 }
 .tweet__textarea {
   width: 80%;

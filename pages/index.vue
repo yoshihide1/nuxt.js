@@ -9,7 +9,7 @@
 import { mapGetters, mapState } from "vuex";
 import firebase from "~/plugins/firebase";
 import navMenu from "~/components/navMenu";
-import tweetForm from "~/components/tweetForm"
+import tweetForm from "~/components/tweetForm";
 
 export default {
   components: {
@@ -17,15 +17,13 @@ export default {
     tweetForm
   },
   data() {
-    return {
-    };
+    return {};
   },
   computed: {
     ...mapState(["userData"])
   },
-  methods: {
-}
-}
+  methods: {}
+};
 </script>
 
 <style>
@@ -36,5 +34,4 @@ export default {
 .font__red {
   color: red;
 }
-
 </style>

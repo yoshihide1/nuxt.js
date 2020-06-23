@@ -40,11 +40,12 @@ export default {
 .nav__button {
   background-color: rgb(48, 187, 241);
   border: 1px solid white;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   font-weight: bold;
   color: white;
   height: 55px;
   width: 100px;
-  margin-left: 1rem;
+  margin: 0;
+  /* margin-left: 1rem; */
 }
 </style>

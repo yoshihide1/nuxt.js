@@ -8,16 +8,20 @@ export const state = () => ({
   userName: "",
   userEmail: "",
   todos: [],
-  tweet: []
+  tweet: [],
+  addTweet: []
 })
 
 export const mutations = {
   setUserData(state, userData) {
     state.userData = userData
   },
-  tweet(state, tweet) {
+  tweet(state, tweet) {//マイページ用に保持
     state.tweet = []
     state.tweet = tweet
+  },
+  addTweet(state, tweet) {//firestoreを通さずに表示
+    state.tweet.unshift(tweet)//先頭に
   }
 }
 export const actions = {
@@ -43,7 +47,7 @@ export const actions = {
       console.log(error)
     })
   },
-  signIn({ commit }, data) {
+  signIn(data) {
     console.log("signin")
     firebase.auth().signInWithEmailAndPassword(data.email, data.password).then(() => {
       this.$router.push('/')
