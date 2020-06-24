@@ -4,11 +4,13 @@
     <p>
       <span class="tweet__name">{{ userData.name }}</span>さんの投稿一覧
     </p>
-    <div v-for="(tweet, index) in myTweet" :key="index">
-      <p class="tweet__tweet">{{ tweet.tweet }}</p>
-      <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
-      <p>{{ tweet.id}}</p>
-      <button @click="deleteTweet(tweet.id)">削除</button>
+    <div class="tweet__list">
+      <div v-for="(tweet, index) in myTweet" :key="index">
+        <p class="tweet__tweet">{{ tweet.tweet }}</p>
+        <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
+        <p>{{ tweet.id}}</p>
+        <button @click="deleteTweet(tweet.id)">削除</button>
+      </div>
     </div>
   </div>
 </template>
@@ -29,30 +31,33 @@ export default {
     };
   },
   computed: {
-    ...mapState(["userData"]),
+    ...mapState(["userData", "updateTweet"]),
     ...mapGetters(["getTweet"]),
     ...mapMutations(["tweet"])
   },
   watch: {
     userData() {
-      console.log("ユーザー取得")
-      this.getMyTweet(this.userData.name)
+      console.log("ユーザー取得");
+      this.getMyTweet(this.userData.name);
+    },
+    updateTweet() {//deleteの後に再取得
+      this.getMyTweet(this.userData.name);
     }
   },
   methods: {
     getMyTweet(name) {
       //自分の投稿の取得
-      console.log(name)
+      console.log(name);
       this.myTweet = this.getTweet(name);
     },
 
     deleteTweet(docId) {
-      this.$store.dispatch("deleteTweet", docId)
+      this.$store.dispatch("deleteTweet", docId);
     }
   },
   created() {
     this.$store.dispatch("checkAuth");
-  },
+  }
 };
 </script>
 
