@@ -4,11 +4,7 @@ const tweetRef = db.collection('tweet')
 
 export const state = () => ({
   userData: {},
-  userUid: "",
-  userName: "",
-  userEmail: "",
-  todos: [],
-  tweet: [],
+  updateTweet: [],
   addTweet: []
 })
 
@@ -17,11 +13,13 @@ export const mutations = {
     state.userData = userData
   },
   tweet(state, tweet) {//マイページ用に保持
-    state.tweet = []
-    state.tweet = tweet
+    console.log(tweet)
+    state.updateTweet = []
+    state.updateTweet = tweet
   },
   addTweet(state, tweet) {//firestoreを通さずに表示
-    state.tweet.unshift(tweet)//先頭に
+    console.log("newTweet")
+    state.updateTweet.unshift(tweet)//先頭に
   }
 }
 export const actions = {
@@ -74,11 +72,27 @@ export const actions = {
       this.$router.push('/login')
     })
   },
+  //firestoreとvuexstoreから削除
+  deleteTweet({ commit, getters }, docId) {
+    console.log("firestore::delete")
+    tweetRef.doc(docId).delete().then(() => {
+      console.log("delete")
+      const getTweet = getters.deleteFilterTweet(docId)
+      console.log(getTweet)
+      commit("tweet", getTweet)
+    }).catch(() => {
+      console.log("error")
+    })
+  }
 
 }
 export const getters = {
+  //マイページに自分の記事を取得
   getTweet: (state) => (name) => {
-    console.log(name)
-    return state.tweet.filter(tweet => tweet.name == name)
+    return state.updateTweet.filter(tweet => tweet.name == name)
+  },
+  //記事を削除しときに残りの記事を取得
+  deleteFilterTweet: (state) => (docId) => {
+    return state.updateTweet.filter(tweet => tweet.id != docId)
   }
 }

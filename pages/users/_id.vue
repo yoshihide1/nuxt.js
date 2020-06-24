@@ -1,13 +1,14 @@
 <template>
   <div class="container">
     <navMenu></navMenu>
-    <p>{{ userData.name }}さんの投稿一覧</p>
+    <p>
+      <span class="tweet__name">{{ userData.name }}</span>さんの投稿一覧
+    </p>
     <div v-for="(tweet, index) in myTweet" :key="index">
-      <p>{{ tweet.name }}</p>
-      <p>{{ tweet.tweet }}</p>
-      <p>{{ tweet.timestamp }}</p>
-      <button>編集</button>
-      <button @click="deleteTweet(index)">削除</button>
+      <p class="tweet__tweet">{{ tweet.tweet }}</p>
+      <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
+      <p>{{ tweet.id}}</p>
+      <button @click="deleteTweet(tweet.id)">削除</button>
     </div>
   </div>
 </template>
@@ -32,20 +33,26 @@ export default {
     ...mapGetters(["getTweet"]),
     ...mapMutations(["tweet"])
   },
-  watch: {},
+  watch: {
+    userData() {
+      console.log("ユーザー取得")
+      this.getMyTweet(this.userData.name)
+    }
+  },
   methods: {
-    getMyTweet() {
+    getMyTweet(name) {
       //自分の投稿の取得
-      this.myTweet = this.getTweet(this.userData.name);
+      console.log(name)
+      this.myTweet = this.getTweet(name);
     },
-    deleteTweet(index) {
-      this.db.collection("tweet").doc();
+
+    deleteTweet(docId) {
+      this.$store.dispatch("deleteTweet", docId)
     }
   },
   created() {
     this.$store.dispatch("checkAuth");
-    this.getMyTweet();
-  }
+  },
 };
 </script>
 

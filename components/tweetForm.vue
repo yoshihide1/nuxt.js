@@ -20,10 +20,10 @@
 
     <div>
       <label for="tweet__list">投稿一覧</label>
-      <div class="tweet__list" v-for="(tweet, index) in tweets" :key="index">
+      <div class="tweet__list" v-for="(tweet, index) in updateTweet" :key="index">
         <p class="tweet__name">{{ tweet.name }}</p>
         <p class="tweet__tweet">{{ tweet.tweet }}</p>
-        <p class="tweet__time">{{ tweet.timestamp.seconds }}</p>
+        <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
 
         <!-- この部分は最後に消す事 -->
         <p>{{ tweet.id }}</p>
@@ -51,7 +51,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(["userData"])
+    ...mapState(["userData", "updateTweet"]),
+    ...mapGetters(["deleteFilterTweet"])
   },
   methods: {
     addTweet() {
@@ -89,6 +90,8 @@ export default {
         });
     },
     featchTweet() {
+      console.log("firestore::get");
+      this.tweets = [];
       this.dbTweet
         .orderBy("timestamp", "desc")
         .limit(50)
@@ -108,16 +111,7 @@ export default {
         });
     },
     deleteTweet(docId) {
-      //記事のIDを取得して削除
-      this.dbTweet
-        .doc(docId)
-        .delete()
-        .then(() => {
-          console.log("削除");
-        })
-        .catch(() => {
-          console.log("error");
-        });
+      this.$store.dispatch("deleteTweet", docId);
     }
   },
   created() {
@@ -143,9 +137,12 @@ export default {
   font-size: 2rem;
   font-weight: bold;
   margin-top: 1rem;
+  margin-bottom: .5rem;
 }
 .tweet__time {
+  margin-top: 1rem;
   margin-bottom: 1rem;
+  font-size: .8rem;
 }
 .tweet__add__button {
   padding: 5px 15px;
