@@ -6,7 +6,7 @@
     <div v-show="flashDelete" class="flash__delete flash">
       <p>削除しました</p>
     </div>
-    <button class="test__button" @click="featchTweet">最新のデータに更新(仮)</button>
+    <!-- <button class="test__button" @click="featchTweet">最新のデータに更新(仮)</button> -->
     <div class="tweet__form">
       <p>
         <textarea
@@ -17,11 +17,13 @@
         ></textarea>
       </p>
       <p>
-        <button class="tweet__add__button" @click="addTweet">投稿</button>
+        <button class="tweet__add__button" @click="
+        checkTweet">投稿</button>
       </p>
-      <p>{{ newTweet.length}}/150</p>
+      <p class="tweet__text__check">{{ newTweet.length}}/150</p>
+      <small class="font__red" v-if="(newTweet.length < 5)">文字数が少なすぎます(５文字以上)</small>
       <small class="font__red" v-if="(newTweet.length > 150)">文字数が多すぎます</small>
-      <p>最大文字数150文字</p>
+      <p class="tweet__text__check">最大文字数150文字</p>
     </div>
 
     <div>
@@ -30,13 +32,26 @@
         <p class="tweet__name">{{ tweet.name }}</p>
         <p class="tweet__tweet">{{ tweet.tweet }}</p>
         <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
-
-        <!-- この部分は最後に消す事 -->
-        <p>{{ tweet.id }}</p>
-
         <div v-if="(tweet.uid == userData.uid)">
           <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">削除</button>
         </div>
+        <p>記事のID>>{{ tweet.id }}</p>
+           <!-- コメント追加 -->
+        <div v-for="(res, index) in resTweet" :key="index">
+          <label for="tweet__comment">コメント</label>
+          <div v-if="tweet.id == res.targetId">
+            <p class="tweet__name">{{ res.name }}</p>
+            <p class="tweet__tweet">{{ res.tweet }}</p>
+            <p class="tweet__time">{{ res.timestamp.toDate() }}</p>
+            <div v-if="(res.uid == userData.uid)">
+              <button class="tweet__delete__button" @click="deleteTweet(tweet.id, res.id)">削除</button>
+            </div>
+          </div>
+        <!-- この部分は最後に消す事 -->
+        <p>コメントのID>>{{ res.id }}</p>
+        </div>
+
+        <button @click="tweetComment(tweet.id)">コメントする</button>
       </div>
     </div>
   </div>
@@ -59,19 +74,19 @@ export default {
     };
   },
   computed: {
-    ...mapState(["userData", "updateTweet"]),
+    ...mapState(["userData", "updateTweet", "resTweet"]),
     ...mapGetters(["deleteFilterTweet"])
   },
   methods: {
+    checkTweet() {
+      if (this.newTweet.length < 5 || this.newTweet.length > 150) {
+        alert("５文字以上、１５０文字以内で入力してください");
+        return;
+      } else {
+        this.addTweet();
+      }
+    },
     addTweet() {
-      if (this.newTweet.length < 5) {
-        alert("文字数が少なすぎます");
-        return;
-      }
-      if (this.newTweet.length > 150) {
-        alert("文字数が多すぎます");
-        return;
-      }
       this.dbTweet
         .add({
           tweet: this.newTweet,
@@ -80,7 +95,6 @@ export default {
           uid: this.userData.uid
         })
         .then(doc => {
-          //flash処理を入れる
           this.flashTweet = true;
           this.flashTimeOut("tweet");
           let { tweet, name, timestamp, uid, id } = {
@@ -99,6 +113,39 @@ export default {
           console.log("error");
         });
     },
+    tweetComment(docId) {
+      //記事に対してのコメント機能
+      this.dbTweet
+        .doc(docId)
+        .collection("messages")
+        .add({
+          tweet: this.newTweet,
+          name: this.userData.name,
+          timestamp: this.timestamp,
+          uid: this.userData.uid,
+          docId: docId //元のコレクションとの紐づけ
+        })
+        .then(doc => {
+          console.log("comment");
+          const { tweet, name, timestamp, uid, targetId, id } = {
+            //コメント用のフォームを作ること！
+            tweet: this.newTweet,
+            name: this.userData.name,
+            timestamp: this.timestamp,
+            uid: this.userData.uid,
+            targetId: docId, //コメント先のID
+            id: doc.id //コメントのID
+          };
+          this.$store.commit("addComment", {tweet, name, timestamp,
+            uid,
+            targetId,
+            id
+          });
+        })
+        .catch(() => {
+          console.log("error");
+        });
+    },
     featchTweet() {
       console.log("firestore::get");
       this.tweets = [];
@@ -108,7 +155,6 @@ export default {
         .get()
         .then(res => {
           res.forEach(doc => {
-            console.log(doc.data());
             this.tweets.push({
               tweet: doc.data().tweet,
               name: doc.data().name,
@@ -120,8 +166,11 @@ export default {
           this.$store.commit("tweet", this.tweets);
         });
     },
-    deleteTweet(docId) {
-      this.$store.dispatch("deleteTweet", docId);
+
+    deleteTweet(docId, targetId) {
+      console.log(docId)
+      console.log(targetId)
+      this.$store.dispatch("deleteTweet", {docId, targetId});
       this.flashDelete = true;
       this.flashTimeOut("dele");
     },
@@ -140,8 +189,11 @@ export default {
   },
   created() {
     console.log("created");
+    //最初のみ実行、それ以降はvuexで管理
+    window.addEventListener("load", () => {
+      this.featchTweet();
+    });
     this.$store.dispatch("checkAuth");
-    this.featchTweet();
   }
 };
 </script>
@@ -193,6 +245,7 @@ export default {
   border-radius: 10px;
 }
 .tweet__delete__button {
+  margin-top: 1rem;
   padding: 5px 15px;
   color: white;
   background-color: rgb(255, 53, 53);
@@ -204,12 +257,15 @@ export default {
   text-align: left; */
   border-top: 2px solid gray;
   /* border-bottom: 2px solid gray; */
-  margin: 2rem auto;
+  margin: 1rem auto;
 }
 .tweet__textarea {
   width: 80%;
   height: 5rem;
   border: 2px solid rgb(209, 209, 209);
   border-radius: 10px;
+}
+.tweet__text__check {
+  font-size: 0.9rem;
 }
 </style>

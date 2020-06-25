@@ -1,8 +1,18 @@
 <template>
   <div>
+    <navMenu />
+    <!-- vue.jsのrouterviewと同じ感じ -->
     <nuxt />
   </div>
 </template>
+<script>
+import navMenu from "@/components/navMenu"
+export default {
+  components: {
+    navMenu
+  }
+}
+</script>
 
 <style>
 html {

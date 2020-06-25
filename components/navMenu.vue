@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div v-if="userData.name" class="nav__menu">
-      <p>こんにちは！{{ userData.name }}さん</p>
+      <p class="hello__user">こんにちは！<span class="hello__user__name">{{ userData.name }}</span>さん</p>
       <div>
         <nuxt-link :to="{name: 'users-id', params: {id: userData.name}}">
           <button class="nav__button">マイページ</button>
@@ -30,6 +30,13 @@ export default {
 </script>
 
 <style>
+.hello__user {
+  line-height: 55px;
+}
+.hello__user__name {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
 .nav__menu {
   display: flex;
   justify-content: space-around;
@@ -39,7 +46,7 @@ export default {
 }
 .nav__button {
   background-color: rgb(48, 187, 241);
-  border: 1px solid white;
+  border: 1px solid rgb(48, 187, 241);
   /* border-radius: 5px; */
   font-weight: bold;
   color: white;
@@ -47,5 +54,10 @@ export default {
   width: 100px;
   margin: 0;
   /* margin-left: 1rem; */
+}
+.nav__button:hover {
+  transition-duration: .7s;
+  background-color: white;
+  color: tomato;
 }
 </style>

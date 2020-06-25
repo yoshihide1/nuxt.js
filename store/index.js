@@ -5,22 +5,32 @@ const tweetRef = db.collection('tweet')
 export const state = () => ({
   userData: {},
   updateTweet: [],
-  addTweet: []
+  resTweet: []
 })
 
 export const mutations = {
   setUserData(state, userData) {
     state.userData = userData
   },
-  tweet(state, tweet) {//マイページ用に保持
-    console.log(tweet)
+  tweet(state, tweet) {//tweetを管理
     state.updateTweet = []
     state.updateTweet = tweet
   },
-  addTweet(state, tweet) {//firestoreを通さずに表示
+  addTweet(state, addTweet) {//新しいTweetをvuesで管理
     console.log("newTweet")
-    state.updateTweet.unshift(tweet)//先頭に
-  }
+    state.updateTweet.unshift(addTweet)//先頭に
+    // state.updateTweet.push(tweet)
+    // state.updateTweet.unshift(state.updateTweet.pop())
+  },
+  resTweet(state, resTweet) {//commentを管理
+    state.resTweet = []
+    state.resTweet = resTweet
+  },
+  addComment(state, addTweet) {//新しいcommentを管理
+    console.log("newComment")
+    state.resTweet.push(addTweet)
+  },
+
 }
 export const actions = {
 
@@ -72,17 +82,32 @@ export const actions = {
       this.$router.push('/login')
     })
   },
-  //firestoreとvuexstoreから削除
-  deleteTweet({ commit, getters }, docId) {
+  /**firestoreとvuexstoreから削除
+   * @param {id} docIdとtargetId 
+   * 元の記事を削除かコメント部分を削除
+   */
+  deleteTweet({ commit, getters }, id) {
     console.log("firestore::delete")
-    tweetRef.doc(docId).delete().then(() => {
-      console.log("delete")
-      const getTweet = getters.deleteFilterTweet(docId)
-      console.log(getTweet)
-      commit("tweet", getTweet)
-    }).catch(() => {
-      console.log("error")
-    })
+    if (id.targetId) {//コメントの削除
+      console.log("if")
+      tweetRef.doc(id.docId).collection("messages")
+        .doc(id.targetId).delete().then(() => {
+          const getRes = getters.deleteFilterMessage(id.targetId)
+          commit("resTweet", getRes)
+          console.log("サブコレクション削除")
+        })
+    } else {//記事の削除
+      tweetRef.doc(id.docId).delete().then(() => {
+        const getTweet = getters.deleteFilterTweet(id.docId)
+        console.log(getTweet)
+        commit("tweet", getTweet)
+      }).catch(() => {
+        console.log("error")
+      })
+    }
+  },
+  deleteComment({ commit, getters }, docId, targetId) {
+    tweetRef.doc(docId).collection("messages").doc(targetId).delete().then
   }
 
 }
@@ -94,5 +119,9 @@ export const getters = {
   //記事を削除しときに残りの記事を取得
   deleteFilterTweet: (state) => (docId) => {
     return state.updateTweet.filter(tweet => tweet.id != docId)
+  },
+  //コメントを削除したときに残りのコメントを取得
+  deleteFilterMessage: (state) => (targetId) => {
+    return state.resTweet.filter(tweet => tweet.id != targetId)
   }
 }

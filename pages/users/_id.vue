@@ -1,16 +1,13 @@
 <template>
   <div class="container">
-    <navMenu></navMenu>
     <p>
       <span class="tweet__name">{{ userData.name }}</span>さんの投稿一覧
     </p>
-    <div class="tweet__list">
-      <div v-for="(tweet, index) in myTweet" :key="index">
-        <p class="tweet__tweet">{{ tweet.tweet }}</p>
-        <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
-        <p>{{ tweet.id}}</p>
-        <button @click="deleteTweet(tweet.id)">削除</button>
-      </div>
+    <div class="tweet__list" v-for="(tweet, index) in myTweet" :key="index">
+      <p class="tweet__tweet margin__top">{{ tweet.tweet }}</p>
+      <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
+      <p>{{ tweet.id}}</p>
+      <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">削除</button>
     </div>
   </div>
 </template>
@@ -18,11 +15,8 @@
 <script>
 import firebase from "~/plugins/firebase";
 import { mapState, mapGetters, mapMutations } from "vuex";
-import navMenu from "~/components/navMenu";
 export default {
-  components: {
-    navMenu
-  },
+  components: {},
 
   data() {
     return {
@@ -37,10 +31,11 @@ export default {
   },
   watch: {
     userData() {
-      console.log("ユーザー取得");
+      console.log("ユーザー情報取得");
       this.getMyTweet(this.userData.name);
     },
-    updateTweet() {//deleteの後に再取得
+    updateTweet() {
+      //deleteの後に再取得
       this.getMyTweet(this.userData.name);
     }
   },
@@ -62,4 +57,7 @@ export default {
 </script>
 
 <style>
+.margin__top {
+  margin-top: 1rem;
+}
 </style>
