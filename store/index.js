@@ -95,6 +95,8 @@ export const actions = {
           const getRes = getters.deleteFilterMessage(id.targetId)
           commit("resTweet", getRes)
           console.log("サブコレクション削除")
+        }).catch(()=> {
+          console.log("error")
         })
     } else {//記事の削除
       tweetRef.doc(id.docId).delete().then(() => {
@@ -106,21 +108,17 @@ export const actions = {
       })
     }
   },
-  deleteComment({ commit, getters }, docId, targetId) {
-    tweetRef.doc(docId).collection("messages").doc(targetId).delete().then
-  }
-
 }
 export const getters = {
   //マイページに自分の記事を取得
   getTweet: (state) => (name) => {
     return state.updateTweet.filter(tweet => tweet.name == name)
   },
-  //記事を削除しときに残りの記事を取得
+  //記事を削除しときに残りの記事を取得して更新
   deleteFilterTweet: (state) => (docId) => {
     return state.updateTweet.filter(tweet => tweet.id != docId)
   },
-  //コメントを削除したときに残りのコメントを取得
+  //コメントを削除したときに残りのコメントを取得して更新
   deleteFilterMessage: (state) => (targetId) => {
     return state.resTweet.filter(tweet => tweet.id != targetId)
   }

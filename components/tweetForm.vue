@@ -6,7 +6,6 @@
     <div v-show="flashDelete" class="flash__delete flash">
       <p>削除しました</p>
     </div>
-    <!-- <button class="test__button" @click="featchTweet">最新のデータに更新(仮)</button> -->
     <div class="tweet__form">
       <p>
         <textarea
@@ -35,10 +34,13 @@
         <div v-if="(tweet.uid == userData.uid)">
           <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">削除</button>
         </div>
+        <!-- ↓この部分は最後に消す事↓ -->
         <p>記事のID>>{{ tweet.id }}</p>
-           <!-- コメント追加 -->
+        <!-- ↑この部分は最後に消す事↑ -->
+        <!-- コメント追加 -->
+        <label for="tweet__comment">コメント</label>
         <div v-for="(res, index) in resTweet" :key="index">
-          <label for="tweet__comment">コメント</label>
+          <!-- idで紐づいたものだけ表示 -->
           <div v-if="tweet.id == res.targetId">
             <p class="tweet__name">{{ res.name }}</p>
             <p class="tweet__tweet">{{ res.tweet }}</p>
@@ -46,12 +48,13 @@
             <div v-if="(res.uid == userData.uid)">
               <button class="tweet__delete__button" @click="deleteTweet(tweet.id, res.id)">削除</button>
             </div>
+            <!-- ↓この部分は最後に消す事↓ -->
+            <p>コメントのID>>{{ res.id }}</p>
+            <!-- ↑この部分は最後に消す事↑ -->
           </div>
-        <!-- この部分は最後に消す事 -->
-        <p>コメントのID>>{{ res.id }}</p>
         </div>
 
-        <button @click="tweetComment(tweet.id)">コメントする</button>
+        <button class="tweet__comment__button" @click="tweetComment(tweet.id)">コメントする</button>
       </div>
     </div>
   </div>
@@ -87,6 +90,7 @@ export default {
       }
     },
     addTweet() {
+      //firestoreとvuexに追加
       this.dbTweet
         .add({
           tweet: this.newTweet,
@@ -113,8 +117,11 @@ export default {
           console.log("error");
         });
     },
+    /**
+     * 記事に対してのコメント機能
+     * firestore_tweetコレクション内のサブコレクションとvuexに追加
+     */
     tweetComment(docId) {
-      //記事に対してのコメント機能
       this.dbTweet
         .doc(docId)
         .collection("messages")
@@ -136,7 +143,10 @@ export default {
             targetId: docId, //コメント先のID
             id: doc.id //コメントのID
           };
-          this.$store.commit("addComment", {tweet, name, timestamp,
+          this.$store.commit("addComment", {
+            tweet,
+            name,
+            timestamp,
             uid,
             targetId,
             id
@@ -146,6 +156,7 @@ export default {
           console.log("error");
         });
     },
+    //ページ読み込み時の最初だけfirestoreから取得
     featchTweet() {
       console.log("firestore::get");
       this.tweets = [];
@@ -168,9 +179,7 @@ export default {
     },
 
     deleteTweet(docId, targetId) {
-      console.log(docId)
-      console.log(targetId)
-      this.$store.dispatch("deleteTweet", {docId, targetId});
+      this.$store.dispatch("deleteTweet", { docId, targetId });
       this.flashDelete = true;
       this.flashTimeOut("dele");
     },
@@ -227,7 +236,7 @@ export default {
   margin: 2rem 0;
 }
 .tweet__name {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
@@ -243,6 +252,8 @@ export default {
   background-color: rgb(48, 187, 241);
   border: 2px solid rgb(209, 209, 209);
   border-radius: 10px;
+  font-weight: bold;
+
 }
 .tweet__delete__button {
   margin-top: 1rem;
@@ -251,12 +262,19 @@ export default {
   background-color: rgb(255, 53, 53);
   border: 2px solid rgb(209, 209, 209);
   border-radius: 10px;
+  font-weight: bold;
+
+}
+.tweet__comment__button {
+  padding: 5px 15px;
+  color: white;
+  background-color: rgb(95, 230, 42);
+  border: 2px solid rgb(209, 209, 209);
+  border-radius: 10px;
+  font-weight: bold;
 }
 .tweet__list {
-  /* width: 90%;
-  text-align: left; */
   border-top: 2px solid gray;
-  /* border-bottom: 2px solid gray; */
   margin: 1rem auto;
 }
 .tweet__textarea {
