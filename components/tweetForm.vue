@@ -3,6 +3,9 @@
     <div v-show="flashTweet" class="flash__tweet flash">
       <p>投稿しました</p>
     </div>
+    <div v-show="flashComment" class="flash__comment flash">
+      <p>コメントしました</p>
+    </div>
     <div v-show="flashDelete" class="flash__delete flash">
       <p>削除しました</p>
     </div>
@@ -72,7 +75,9 @@ export default {
       timestamp: firebase.firestore.Timestamp.now(),
       newTweet: "",
       tweets: [],
+      comment: [],
       flashTweet: false,
+      flashComment: false,
       flashDelete: false
     };
   },
@@ -120,8 +125,11 @@ export default {
     /**
      * 記事に対してのコメント機能
      * firestore_tweetコレクション内のサブコレクションとvuexに追加
+     * @param = コメント追加先の記事のID
      */
     tweetComment(docId) {
+      this.flashComment = true;
+      this.flashTimeOut("comment");
       this.dbTweet
         .doc(docId)
         .collection("messages")
@@ -130,7 +138,7 @@ export default {
           name: this.userData.name,
           timestamp: this.timestamp,
           uid: this.userData.uid,
-          docId: docId //元のコレクションとの紐づけ
+          docId: docId //コメント先の記事のID紐づけするため
         })
         .then(doc => {
           console.log("comment");
@@ -158,11 +166,11 @@ export default {
     },
     //ページ読み込み時の最初だけfirestoreから取得
     featchTweet() {
+      //コレクション
       console.log("firestore::get");
-      this.tweets = [];
       this.dbTweet
         .orderBy("timestamp", "desc")
-        .limit(50)
+        .limit(30)
         .get()
         .then(res => {
           res.forEach(doc => {
@@ -177,6 +185,28 @@ export default {
           this.$store.commit("tweet", this.tweets);
         });
     },
+    featchComment() {
+      //
+      console.log("firestore::get Comment");
+      firebase
+        .firestore()
+        .collectionGroup("messages")
+        .limit(20)
+        .get()
+        .then(res => {
+          res.forEach(doc => {
+            this.comment.push({
+              tweet: doc.data().tweet,
+              name: doc.data().name,
+              timestamp: doc.data().timestamp,
+              uid: doc.data().uid,
+              targetId: doc.data().docId, //元の記事のID,
+              id: doc.id
+            });
+          });
+          this.$store.commit("resTweet", this.comment);
+        });
+    },
 
     deleteTweet(docId, targetId) {
       this.$store.dispatch("deleteTweet", { docId, targetId });
@@ -188,6 +218,9 @@ export default {
         switch (name) {
           case "tweet":
             this.flashTweet = false;
+            break;
+          case "comment":
+            this.flashComment = false;
             break;
           case "dele":
             this.flashDelete = false;
@@ -201,6 +234,8 @@ export default {
     //最初のみ実行、それ以降はvuexで管理
     window.addEventListener("load", () => {
       this.featchTweet();
+      this.featchComment();
+      // this.$store.dispatch("featchTweet")
     });
     this.$store.dispatch("checkAuth");
   }
@@ -220,18 +255,18 @@ export default {
   width: 100%;
   margin: 0 auto;
   padding: 20px;
+  color: white;
+  font-size: 1.3rem;
 }
 .flash__delete {
   background-color: rgba(255, 100, 100, 0.8);
-  color: white;
-  font-size: 1.3rem;
+}
+.flash__comment {
+  background-color: rgba(144, 146, 122, 0.8);
 }
 .flash__tweet {
   background-color: rgba(31, 209, 31, 0.8);
-  color: white;
-  font-size: 1.3rem;
 }
-
 .tweet__form {
   margin: 2rem 0;
 }
@@ -253,17 +288,15 @@ export default {
   border: 2px solid rgb(209, 209, 209);
   border-radius: 10px;
   font-weight: bold;
-
 }
 .tweet__delete__button {
-  margin-top: 1rem;
+  margin-top: .5rem;
   padding: 5px 15px;
   color: white;
   background-color: rgb(255, 53, 53);
   border: 2px solid rgb(209, 209, 209);
   border-radius: 10px;
   font-weight: bold;
-
 }
 .tweet__comment__button {
   padding: 5px 15px;

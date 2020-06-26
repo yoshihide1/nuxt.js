@@ -5,7 +5,7 @@ const tweetRef = db.collection('tweet')
 export const state = () => ({
   userData: {},
   updateTweet: [],
-  resTweet: []
+  resTweet: [],
 })
 
 export const mutations = {
@@ -13,16 +13,16 @@ export const mutations = {
     state.userData = userData
   },
   tweet(state, tweet) {//tweetを管理
+    console.log(tweet)
     state.updateTweet = []
     state.updateTweet = tweet
   },
   addTweet(state, addTweet) {//新しいTweetをvuesで管理
     console.log("newTweet")
     state.updateTweet.unshift(addTweet)//先頭に
-    // state.updateTweet.push(tweet)
-    // state.updateTweet.unshift(state.updateTweet.pop())
   },
   resTweet(state, resTweet) {//commentを管理
+    console.log(resTweet)
     state.resTweet = []
     state.resTweet = resTweet
   },

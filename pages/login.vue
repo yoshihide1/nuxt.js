@@ -46,10 +46,10 @@ export default {
   methods: {
     emailLogin() {
       let name, email, password;
-      //半角英巣、記号のみと６文字以上～１６文字以内
+      //半角英巣、記号のみと〇文字以上～〇文字以内
       if (
         this.name.match(
-          /^[a-zA-Z0-9!-/:-@¥[-`{-~]*$/ && /^([a-zA-Z0-9]{5,16})$/
+          /^[a-zA-Z0-9!-/:-@¥[-`{-~]*$/ && /^([a-zA-Z0-9]{3,16})$/
         )
       ) {
         name = this.name;
