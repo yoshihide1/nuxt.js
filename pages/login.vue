@@ -76,8 +76,8 @@ export default {
       this.$store.dispatch("emailLogin", { name, email, password });
     },
     signIn() {
-      const email = this.email;
-      const password = this.password;
+      let email = this.email;
+      let password = this.password;
       this.$store.dispatch("signIn", { email, password });
     }
   }

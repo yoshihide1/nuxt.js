@@ -12,6 +12,10 @@ export const mutations = {
   setUserData(state, userData) {
     state.userData = userData
   },
+  clearUserData(state) {
+    console.log("clear")
+    state.userData = {}
+  },
   tweet(state, tweet) {//tweetを管理
     console.log(tweet)
     state.updateTweet = []
@@ -55,9 +59,11 @@ export const actions = {
       console.log(error)
     })
   },
-  signIn(data) {
+  signIn({ commit }, data ) {
+    console.log(data)
     console.log("signin")
-    firebase.auth().signInWithEmailAndPassword(data.email, data.password).then(() => {
+    firebase.auth().signInWithEmailAndPassword(data.email, data.password).then((result) => {
+      console.log(result)
       this.$router.push('/')
     }).catch(() => {
       alert("一致する登録情報がありません")
@@ -77,8 +83,9 @@ export const actions = {
       }
     })
   },
-  signOut() {
+  signOut({ commit }) {
     firebase.auth().signOut().then(() => {
+      commit("clearUserData")
       this.$router.push('/login')
     })
   },

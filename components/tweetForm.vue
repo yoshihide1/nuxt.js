@@ -12,7 +12,7 @@
     <div class="tweet__form">
       <p>
         <textarea
-          class="tweet__textarea"
+          class="tweet__textarea__tweet"
           v-model="newTweet"
           maxlength="150"
           placeholder="150文字以内で入力してください"
@@ -38,7 +38,7 @@
           <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">削除</button>
         </div>
         <!-- ↓この部分は最後に消す事↓ -->
-        <p>記事のID>>{{ tweet.id }}</p>
+        <p class="id__check">記事のID>>{{ tweet.id }}</p>
         <!-- ↑この部分は最後に消す事↑ -->
         <!-- コメント追加 -->
         <label for="tweet__comment">コメント</label>
@@ -52,12 +52,22 @@
               <button class="tweet__delete__button" @click="deleteTweet(tweet.id, res.id)">削除</button>
             </div>
             <!-- ↓この部分は最後に消す事↓ -->
-            <p>コメントのID>>{{ res.id }}</p>
+            <p class="id__check">コメントのID>>{{ res.id }}</p>
             <!-- ↑この部分は最後に消す事↑ -->
           </div>
         </div>
+        <div>
+          <p>
+            <textarea
+              class="tweet__textarea__comment"
+              v-model="newComment"
+              maxlength="150"
+              placeholder="5文字以上、150文字以内で入力してください"
+            ></textarea>
+          </p>
 
-        <button class="tweet__comment__button" @click="tweetComment(tweet.id)">コメントする</button>
+          <button class="tweet__comment__button" @click="checkComment(tweet.id)">コメントする</button>
+        </div>
       </div>
     </div>
   </div>
@@ -74,8 +84,7 @@ export default {
       dbTweet: firebase.firestore().collection("tweet"),
       timestamp: firebase.firestore.Timestamp.now(),
       newTweet: "",
-      tweets: [],
-      comment: [],
+      newComment: "",
       flashTweet: false,
       flashComment: false,
       flashDelete: false
@@ -86,14 +95,22 @@ export default {
     ...mapGetters(["deleteFilterTweet"])
   },
   methods: {
+    //id=記事のID
     checkTweet() {
-      if (this.newTweet.length < 5 || this.newTweet.length > 150) {
-        alert("５文字以上、１５０文字以内で入力してください");
+      if (this.newTweet.length < 3 || this.newTweet.length > 150) {
+        alert("5文字以上、150文字以内で入力してください");
         return;
       } else {
         this.addTweet();
       }
     },
+    checkComment(id) {
+      if (this.newComment.length < 3 || this.newComment.length > 150) {
+        alert("コメントは5文字以上、150文字以内で入力してください");
+        } else {
+          this.tweetComment(id)
+        }
+      },
     addTweet() {
       //firestoreとvuexに追加
       this.dbTweet
@@ -125,7 +142,7 @@ export default {
     /**
      * 記事に対してのコメント機能
      * firestore_tweetコレクション内のサブコレクションとvuexに追加
-     * @param = コメント追加先の記事のID
+     * @docId コメント追加先の記事のID
      */
     tweetComment(docId) {
       this.flashComment = true;
@@ -134,7 +151,7 @@ export default {
         .doc(docId)
         .collection("messages")
         .add({
-          tweet: this.newTweet,
+          tweet: this.newComment,
           name: this.userData.name,
           timestamp: this.timestamp,
           uid: this.userData.uid,
@@ -143,8 +160,7 @@ export default {
         .then(doc => {
           console.log("comment");
           const { tweet, name, timestamp, uid, targetId, id } = {
-            //コメント用のフォームを作ること！
-            tweet: this.newTweet,
+            tweet: this.newComment,
             name: this.userData.name,
             timestamp: this.timestamp,
             uid: this.userData.uid,
@@ -159,55 +175,12 @@ export default {
             targetId,
             id
           });
+          this.newComment = ""
         })
         .catch(() => {
           console.log("error");
         });
     },
-    //ページ読み込み時の最初だけfirestoreから取得
-    featchTweet() {
-      //コレクション
-      console.log("firestore::get");
-      this.dbTweet
-        .orderBy("timestamp", "desc")
-        .limit(30)
-        .get()
-        .then(res => {
-          res.forEach(doc => {
-            this.tweets.push({
-              tweet: doc.data().tweet,
-              name: doc.data().name,
-              timestamp: doc.data().timestamp,
-              uid: doc.data().uid,
-              id: doc.id //ドキュメントid
-            });
-          });
-          this.$store.commit("tweet", this.tweets);
-        });
-    },
-    featchComment() {
-      //
-      console.log("firestore::get Comment");
-      firebase
-        .firestore()
-        .collectionGroup("messages")
-        .limit(20)
-        .get()
-        .then(res => {
-          res.forEach(doc => {
-            this.comment.push({
-              tweet: doc.data().tweet,
-              name: doc.data().name,
-              timestamp: doc.data().timestamp,
-              uid: doc.data().uid,
-              targetId: doc.data().docId, //元の記事のID,
-              id: doc.id
-            });
-          });
-          this.$store.commit("resTweet", this.comment);
-        });
-    },
-
     deleteTweet(docId, targetId) {
       this.$store.dispatch("deleteTweet", { docId, targetId });
       this.flashDelete = true;
@@ -228,16 +201,6 @@ export default {
         }
       }, 1500);
     }
-  },
-  created() {
-    console.log("created");
-    //最初のみ実行、それ以降はvuexで管理
-    window.addEventListener("load", () => {
-      this.featchTweet();
-      this.featchComment();
-      // this.$store.dispatch("featchTweet")
-    });
-    this.$store.dispatch("checkAuth");
   }
 };
 </script>
@@ -290,7 +253,7 @@ export default {
   font-weight: bold;
 }
 .tweet__delete__button {
-  margin-top: .5rem;
+  margin-top: 0.5rem;
   padding: 5px 15px;
   color: white;
   background-color: rgb(255, 53, 53);
@@ -310,13 +273,23 @@ export default {
   border-top: 2px solid gray;
   margin: 1rem auto;
 }
-.tweet__textarea {
+.tweet__textarea__tweet {
   width: 80%;
   height: 5rem;
   border: 2px solid rgb(209, 209, 209);
   border-radius: 10px;
 }
+.tweet__textarea__comment {
+  width: 60%;
+  height: 4rem;
+  border: 2px solid rgb(209, 209, 209);
+  border-radius: 10px;
+}
 .tweet__text__check {
   font-size: 0.9rem;
+}
+.id__check {
+  margin: 10px;
+  color: deeppink;
 }
 </style>
