@@ -10,7 +10,7 @@ import navMenu from "@/components/navMenu"
 export default {
   components: {
     navMenu
-  }
+  },
 }
 </script>
 

@@ -35,7 +35,7 @@
         <p class="tweet__tweet">{{ tweet.tweet }}</p>
         <p class="tweet__time">{{ tweet.timestamp.toDate() }}</p>
         <div v-if="(tweet.uid == userData.uid)">
-          <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">削除</button>
+          <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">記事の削除</button>
         </div>
         <!-- ↓この部分は最後に消す事↓ -->
         <p class="id__check">記事のID>>{{ tweet.id }}</p>
@@ -49,7 +49,7 @@
             <p class="tweet__tweet">{{ res.tweet }}</p>
             <p class="tweet__time">{{ res.timestamp.toDate() }}</p>
             <div v-if="(res.uid == userData.uid)">
-              <button class="tweet__delete__button" @click="deleteTweet(tweet.id, res.id)">削除</button>
+              <button class="tweet__delete__button" @click="deleteTweet(tweet.id, res.id)">コメントの削除</button>
             </div>
             <!-- ↓この部分は最後に消す事↓ -->
             <p class="id__check">コメントのID>>{{ res.id }}</p>

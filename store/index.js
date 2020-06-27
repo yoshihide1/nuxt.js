@@ -59,11 +59,10 @@ export const actions = {
       console.log(error)
     })
   },
-  signIn({ commit }, data ) {
+  signIn({ commit }, data) {
     console.log(data)
     console.log("signin")
-    firebase.auth().signInWithEmailAndPassword(data.email, data.password).then((result) => {
-      console.log(result)
+    firebase.auth().signInWithEmailAndPassword(data.email, data.password).then(() => {
       this.$router.push('/')
     }).catch(() => {
       alert("一致する登録情報がありません")
@@ -102,7 +101,7 @@ export const actions = {
           const getRes = getters.deleteFilterMessage(id.targetId)
           commit("resTweet", getRes)
           console.log("サブコレクション削除")
-        }).catch(()=> {
+        }).catch(() => {
           console.log("error")
         })
     } else {//記事の削除
@@ -110,9 +109,20 @@ export const actions = {
         const getTweet = getters.deleteFilterTweet(id.docId)
         console.log(getTweet)
         commit("tweet", getTweet)
-      }).catch(() => {
-        console.log("error")
+        // docs.ref.id記事に紐づいたコメントの削除
+        tweetRef.doc(id.docId).collection("messages")
+          .where("docId", "==", id.docId)
+          .get().then((result) => {
+            result.forEach(docs => {
+              tweetRef.doc(id.docId).collection("messages").doc(docs.ref.id)
+                .delete().then(() => {
+                  console.log("OK")
+                })
+            })
+          })
       })
+
+      //コレクションの削除
     }
   },
 }
