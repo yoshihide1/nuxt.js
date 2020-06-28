@@ -97,7 +97,7 @@ export default {
   methods: {
     //id=記事のID
     checkTweet() {
-      if (this.newTweet.length < 3 || this.newTweet.length > 150) {
+      if (this.newTweet.length < 4 || this.newTweet.length > 150) {
         alert("5文字以上、150文字以内で入力してください");
         return;
       } else {
@@ -105,7 +105,7 @@ export default {
       }
     },
     checkComment(id) {
-      if (this.newComment.length < 3 || this.newComment.length > 150) {
+      if (this.newComment.length < 4 || this.newComment.length > 150) {
         alert("コメントは5文字以上、150文字以内で入力してください");
         } else {
           this.tweetComment(id)

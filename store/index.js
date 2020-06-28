@@ -107,7 +107,6 @@ export const actions = {
     } else {//記事の削除
       tweetRef.doc(id.docId).delete().then(() => {
         const getTweet = getters.deleteFilterTweet(id.docId)
-        console.log(getTweet)
         commit("tweet", getTweet)
         // docs.ref.id記事に紐づいたコメントの削除
         tweetRef.doc(id.docId).collection("messages")
@@ -121,8 +120,6 @@ export const actions = {
             })
           })
       })
-
-      //コレクションの削除
     }
   },
 }

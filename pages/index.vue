@@ -7,7 +7,7 @@
 <script>
 import tweetForm from "~/components/tweetForm";
 import firebase from "~/plugins/firebase";
-
+import { mapState } from "vuex";
 export default {
   components: {
     tweetForm
@@ -18,15 +18,18 @@ export default {
       comments: []
     };
   },
-  computed: {},
+  computed: {
+    ...mapState(["updateTweet", "resTweet"])
+  },
   created() {
-    console.log("created");
-    window.addEventListener("load", () => {
-      console.log("load");
+    //最初一回だけ実行させるため。
+    if (this.updateTweet.length == 0) {
+      console.log("featch");
       this.featchTweet();
       this.featchComment();
-    });
+    }
     this.$store.dispatch("checkAuth");
+    console.log("created");
   },
   methods: {
     //ページ読み込み時の最初だけfirestoreから取得
