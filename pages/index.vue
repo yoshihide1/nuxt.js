@@ -19,7 +19,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["updateTweet", "resTweet"])
+    ...mapState(["updateTweet"])
   },
   created() {
     //最初一回だけ実行させるため。
