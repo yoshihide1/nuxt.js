@@ -31,8 +31,7 @@
         </a>
       </div>
       <div id="sp__nav" v-show="isActive" @click="showIsActive">
-          <div>
-
+        <div>
           <nuxt-link :to="{name: 'users-id', params: {id: userData.name}}">
             <button class="nav__button sp__nav__button">マイページ</button>
           </nuxt-link>
@@ -51,7 +50,7 @@ import { mapState } from "vuex";
 export default {
   data() {
     return {
-      isActive: false,
+      isActive: false
     };
   },
   computed: {
@@ -59,7 +58,7 @@ export default {
   },
   methods: {
     showIsActive() {
-      this.isActive =! this.isActive
+      this.isActive = !this.isActive;
     },
     signOut() {
       this.$store.dispatch("signOut");
@@ -86,13 +85,11 @@ export default {
 .nav__button {
   background-color: rgb(48, 187, 241);
   border: 1px solid rgb(48, 187, 241);
-  /* border-radius: 5px; */
   font-weight: bold;
   color: white;
   height: 55px;
   width: 100px;
   margin: 0;
-  /* margin-left: 1rem; */
 }
 .nav__button:hover {
   transition-duration: 0.7s;
@@ -110,24 +107,25 @@ export default {
     display: none;
   }
   #sp__nav {
+    transition: 11s;
     position: fixed;
     display: block;
-height: 100%;
+    height: 100%;
     width: 100%;
-    background-color: rgba(255, 255, 255, .8);
+    background-color: rgba(255, 255, 255, 0.8);
   }
   .sp__nav__button {
     width: 100%;
     padding: 20px 0;
     border-top: 2px solid white;
     font-size: 4vw;
-    
+    line-height: 18px;
   }
-.nav__menu {
-  justify-content: space-between;
-padding: 0 2%;
-}
-.menu__trigger,
+  .nav__menu {
+    justify-content: space-between;
+    padding: 0 2%;
+  }
+  .menu__trigger,
   .menu__trigger span {
     display: block;
     transition: all 0.5s;

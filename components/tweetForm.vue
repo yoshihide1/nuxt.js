@@ -37,9 +37,6 @@
         <div v-if="(tweet.uid == userData.uid)">
           <button class="tweet__delete__button" @click="deleteTweet(tweet.id)">記事の削除</button>
         </div>
-        <!-- ↓この部分は最後に消す事↓ -->
-        <p class="id__check">記事のID>>{{ tweet.id }}</p>
-        <!-- ↑この部分は最後に消す事↑ -->
         <!-- コメント追加 -->
         <label for="tweet__comment">コメント</label>
         <div v-for="(res, index) in resTweet" :key="index">
@@ -51,9 +48,6 @@
             <div v-if="(res.uid == userData.uid)">
               <button class="tweet__delete__button" @click="deleteTweet(tweet.id, res.id)">コメントの削除</button>
             </div>
-            <!-- ↓この部分は最後に消す事↓ -->
-            <p class="id__check">コメントのID>>{{ res.id }}</p>
-            <!-- ↑この部分は最後に消す事↑ -->
           </div>
         </div>
         <div>
@@ -107,10 +101,10 @@ export default {
     checkComment(id) {
       if (this.newComment.length < 4 || this.newComment.length > 150) {
         alert("コメントは5文字以上、150文字以内で入力してください");
-        } else {
-          this.tweetComment(id)
-        }
-      },
+      } else {
+        this.tweetComment(id);
+      }
+    },
     addTweet() {
       //firestoreとvuexに追加
       this.dbTweet
@@ -175,7 +169,7 @@ export default {
             targetId,
             id
           });
-          this.newComment = ""
+          this.newComment = "";
         })
         .catch(() => {
           console.log("error");
