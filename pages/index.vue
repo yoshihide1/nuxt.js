@@ -23,8 +23,6 @@ export default {
   },
   created() {
     //最初一回だけ実行させるため。
-    console.log(process.env.VUE_APP_apiKey)
-    console.log(process.env.VUE_APP_authDomain)
     if (this.updateTweet.length == 0) {
       console.log("featch");
       this.featchTweet();
