@@ -13,7 +13,7 @@
       <input class="login__input" v-model="password" type="password" placeholder="Password(６～１６文字)" />
     </p>
     <p>
-      <button class="login__button" @click="emailLogin">Login</button>
+      <button class="login__button" @click="emailLogin">新規登録</button>
     </p>
 
     <label for="email">Email</label>
@@ -26,7 +26,7 @@
       <input class="login__input" v-model="password" type="password" placeholder="Password(半角英数字)" />
     </p>
     <p>
-      <button class="login__button" @click="signIn">SignIn</button>
+      <button class="login__button" @click="signIn">ログイン</button>
     </p>
   </div>
 </template>
