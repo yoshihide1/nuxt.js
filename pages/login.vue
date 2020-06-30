@@ -107,4 +107,15 @@ export default {
   border-radius: 10px;
   margin-bottom: 20px;
 }
+@media screen and (max-width: 768px) {
+  .container {
+    width: 90%;
+  }
+  .login__input {
+    width: 90%;
+  }
+  .login__button {
+    width: 50%;
+  }
+}
 </style>

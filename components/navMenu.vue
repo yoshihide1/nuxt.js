@@ -22,7 +22,9 @@
       <div class="nav__menu">
         <p class="hello__user">
           こんにちは！
-          <span class="hello__user__name">{{ userData.name }}</span>さん
+          <span class="hello__user__name">
+            {{ userData.name ? userData.name + "さん" : "" }}
+          </span>
         </p>
         <a @click="showIsActive" class="menu__trigger" :class="{ active:isActive }" href="#">
           <span></span>
