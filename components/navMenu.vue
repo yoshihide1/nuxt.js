@@ -107,7 +107,6 @@ export default {
     display: none;
   }
   #sp__nav {
-    transition: 11s;
     position: fixed;
     display: block;
     height: 100%;
